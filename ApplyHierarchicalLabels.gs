@@ -1,18 +1,18 @@
 THREAD_COUNT_LIMIT = 50
 
-function IsLabelOrganizationalOnly( str )
+function IsSoftLabel( str ) 
 {
   var suffix = '-';
   return str.indexOf( suffix, str.length - suffix.length ) !== -1;
 }
 
-function FixHierarchicalLabels()
+function ApplyHierarchicalLabels() 
 {
   var userLabels = GmailApp.getUserLabels();
   var threadCount = 0;
-
-  Logger.log( "Fixing Gmail hierarchical labels" );
-
+  
+  Logger.log( "Applying Gmail hierarchical labels" );
+  
   for( var labelIndex = 0; labelIndex < userLabels.length; ++labelIndex )
   {
     var label = userLabels[ labelIndex ];
@@ -22,37 +22,37 @@ function FixHierarchicalLabels()
     {
       if( threadCount > THREAD_COUNT_LIMIT )
         return;
-
+      
       var childName = labelPath.slice( 0, pathIndex ).join( '/' );
-
-      if( IsLabelOrganizationalOnly( childName ) )
+      
+      if( IsSoftLabel( childName ) ) 
         continue;
 
       var parentIndex = pathIndex;
-      do
+      do 
       {
         --parentIndex;
         var parentName = labelPath.slice( 0, parentIndex ).join( '/' );
-      } while( IsLabelOrganizationalOnly( parentName ) )
-
+      } while( IsSoftLabel( parentName ) )
+        
       var parentLabel = GmailApp.getUserLabelByName( parentName );
       if( !parentLabel )
         continue;
-
+      
       var threads = GmailApp.search( "label:" + childName + " -label:" + parentName, 0, THREAD_COUNT_LIMIT );
-
+      
       for( var threadIndex = 0; threadIndex < threads.length; ++threadIndex )
       {
         var thread = threads[ threadIndex ];
-
+        
         thread.addLabel( parentLabel );
         ++threadCount;
-
+        
         //var subject = thread.getFirstMessageSubject();
-        //Logger.log( "Added label '" + parentName + "' to thread: " + subject.substring( 0, 32 ) + ( subject.length > 32 ? "..." : "" ) );
+        //Logger.log( "Added label '" + parentName + "' to thread: " + subject.substring( 0, 32 ) + ( subject.length > 32 ? "..." : "" ) ); 
       }
     }
-  }
+  }    
 
-  Logger.log( "Fixed " + threadCount + " threads" );
+  Logger.log( "Applied labels over " + threadCount + " thread(s)" );
 }
