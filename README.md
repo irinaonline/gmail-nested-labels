@@ -27,3 +27,4 @@ Create a project in Google Apps Script, paste the code inside it, and use the pr
 I would recommend to 'Apply the hierarchical labels' once a hour, or a day. It may take some time to fix all your messages in the first runs, because it will go through your emails by batches, to avoid running for longer periods of time and exceeding the limits of Google Apps Script.
 
 # Disclaimer
+See LICENSE.txt
